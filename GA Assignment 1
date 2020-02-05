@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <cassert>  //for assert()
 #include <cstddef>
 #include "ArgumentManager.h"
 using namespace std;
@@ -9,28 +9,136 @@ using namespace std;
 ifstream haruFileName("haru_miya");
 ifstream jituFileName("jitu_miya");
 
-struct node
-{
-  int x;
-  node* next = nullptr;
+
+template <typename T>
+class List{
+
+private:
+     struct Node{
+          Node * Next{NULL};  //this is a pointer that hold the address of a node
+          T Data{}; //this hold the data of the node type T
+
+          // this is a default constructor that sets everything to null
+          Node( ) = default;
+
+          //creates a node stroring input data
+          explicit Node (const T& data)
+               : Data{data}{}
+
+          /*creates a node storing input data and poiting to another node*/
+          Node (const T& data, Node* next)
+               : Data{data}, Next{next}{}
+
+     };
+
+     Node* m_head{NULL}; //hold the address of the head
+     int m_count{0};     // hold the number of nodes in thel ist
+
+     //doesnt allow copy ///basically deletes the functionality unless i program it to do so
+     List(const List&) = delete;
+     List& operator = (const List&) = delete;
+
+public:
+     typedef Node* Position; //shows the address to a pointer
+
+     List() = default; //making an empty list
+
+     ~List(){  //properly deletes each node in the list
+          Clear();
+     }
+
+     int Count() const{  //keeps count of list
+          return m_count;
+     }
+
+     bool IsEmpty() const{    //checks if list is empty
+          return (m_count ==0);
+     }
+
+     void Clear(){  //take everything out of the list
+          while (! IsEmpty()){
+               RemoveHead(); //removes the current head node
+          }
+     }
+
+     void InsertHead(const T& value){
+          Node* node = new Node{value}; //making a new node
+
+          node->Next = m_head;     //points the new node to the head node
+          m_head = node;                //points the variable that holds the head to the new node
+
+          ++ m_count;
+     }
+
+     void RemoveHead(){
+          assert( ! IsEmpty()); //checks that the head is empty if it is then the program end if not then keep going
+
+          Node* newHead = m_head->Next; //saves pointer to head's next node, before removing current head // basically, hea's next node will becmoe the *new* head
+
+          //removes current head which is a node
+          delete m_head;
+
+          //update head, pointing to the node that followed the old head
+          m_head = newHead;
+
+          --m_count;
+     }
+
+     T ElementAt (Position node){  //access the data stored in a given node
+          assert(! IsEmpty());
+          assert( node != NULL);
+
+          return node->Data;
+     }
+
+     void InsertAfter(Position node, const T& value){
+          assert(node != NULL);
+
+          Node* newNode = new Node{value};   //makes a new node
+
+          //this will insert newNode between 'node' and 'node->next'
+          newNode->Next = node->Next; //newNode will point to what node was pointing to
+          node->Next = newNode; //the node will point to newNode
+
+          ++m_count;
+     }
+
+     void RemoveAfter(Position node){
+          assert( ! IsEmpty());
+          assert(node != NULL);
+
+          Node* obsoleteNode = node->Next; // obNode holds the address to what node is pointing to
+          node->Next = obsoleteNode->Next;
+
+          delete obsoleteNode;
+
+          --m_count;
+
+     }
+
+     Position Find(const T& value){     //passing by refference without allowing change to data to prevent expensive copy of informationg that would happen if passed by value
+          if(IsEmpty()){
+               return NULL;
+          }
+
+          //linear search
+          Node* node = m_head;
+          while(node != NULL){
+               //compare current node's data with the search value
+               if(node->Data == value){
+                    //found
+                    return node;
+               }
+               //moves forward to the next node in the list by seting the address of this node equal to what its pointing to which should be the next node
+               node = node->Next;
+          }
+
+          //after traversing the whole list, no mathcing element was found
+          return NULL;
+     }
+
 };
-class linked 
-{
-  private: 
-    node* head;
-  public:
-    linked() 
-    {
-      head = nullptr;
-    }
-    void addNode(int x)
-    {
-      node* temp = new node;
-      temp ->x = x;
-      temp ->next = head;
-      head = temp;
-    }
-};
+
 int main(int argc, char* argv[]) 
 {
   ArgumentManager am(argc,argv);
