@@ -1,0 +1,42 @@
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstddef>
+#include "ArgumentManager.h"
+using namespace std;
+
+ifstream haruFileName("haru_miya");
+ifstream jituFileName("jitu_miya");
+
+struct node
+{
+  int x;
+  node* next = nullptr;
+};
+class linked 
+{
+  private: 
+    node* head;
+  public:
+    linked() 
+    {
+      head = nullptr;
+    }
+    void addNode(int x)
+    {
+      node* temp = new node;
+      temp ->x = x;
+      temp ->next = head;
+      head = temp;
+    }
+};
+int main(int argc, char* argv[]) 
+{
+  ArgumentManager am(argc,argv);
+  string haruFileName = am.get("haru_miya");
+  string jituFileName = am.get("jitu_miya");
+  string outputFileName = am.get("output");
+  
+    cout << "Alikeness is " << argc << "out of 7";
+}
