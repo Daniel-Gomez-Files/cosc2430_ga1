@@ -6,10 +6,6 @@
 #include "ArgumentManager.h"
 using namespace std;
 
-ifstream haruFileName("haru_miya");
-ifstream jituFileName("jitu_miya");
-
-
 template <typename T>
 class List{
 
@@ -118,10 +114,25 @@ public:
 /////////////////
 ////////////
 ///////////
-     void compare(const List& d, string ofile) const {
+     void compare(const List& obj, string ofile) const {
           ofstream out(ofile); //opens output file
           int amount = 0;
+          Node* node = m_head;
+          Node* node2 =  obj.m_head;
           string* same = new string[m_count]{};   // for output later
+
+          while(node != NULL){
+
+               while(node2 != NULL){
+                    if(node->Data == node2->Data){
+                         same[amount] = node->Data;
+                         ++amount;
+                    }
+                    node2 = node2->Next;
+               }
+               node = node->Next;
+               node2 = obj.m_head;
+          }
 
 
           out << "Alikeness is " << amount << "out of " << m_count << ":\n";
