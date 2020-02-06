@@ -18,7 +18,7 @@ private:
           Node * Next{NULL};  //this is a pointer that hold the address of a node
           T Data{}; //this hold the data of the node type T
 
-          // this is a default constructor that sets everything to null
+          // this is a default constructor that sets ecerything to null
           Node( ) = default;
 
           //creates a node stroring input data
@@ -115,7 +115,24 @@ public:
           --m_count;
 
      }
+/////////////////
+////////////
+///////////
+     void compare(const List& d, string ofile) const {
+          ofstream out(ofile); //opens output file
+          int amount = 0;
+          string* same = new string[m_count]{};   // for output later
 
+          
+          out << "Alikeness is " << amount << "out of " << m_count << ':';
+
+          out.close();
+          delete[] same; // clears out the heap
+          delete same;
+}
+////////////
+//////////
+///////////
      Position Find(const T& value){     //passing by refference without allowing change to data to prevent expensive copy of informationg that would happen if passed by value
           if(IsEmpty()){
                return NULL;
@@ -137,14 +154,35 @@ public:
           return NULL;
      }
 
+     void Read(string file){
+
+          ifstream input(file);          //makes an object to handle the file with data
+          string temp;          //holds the string
+          if(!input){
+               cout << "the file does not exist!\n";
+               exit(1);
+          }
+          while(getline(input, temp)){
+          InsertHead(temp);
+          }
+          input.close();
+     }
 };
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
   ArgumentManager am(argc,argv);
   string haruFileName = am.get("haru_miya");
   string jituFileName = am.get("jitu_miya");
   string outputFileName = am.get("output");
-  
-    cout << "Alikeness is " << argc << "out of 7";
+
+  List <string>haru; //makes a haru object of type string
+  List <string>jitu;; //makes a jitu object of typr string
+
+  haru.Read(haruFileName);    //fills the haru list
+  jitu.Read(jituFileName);    //fills the jitu list
+
+  haru.compare(jitu, outputFileName);
+
+
 }
