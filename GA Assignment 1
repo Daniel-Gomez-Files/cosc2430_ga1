@@ -123,8 +123,11 @@ public:
           int amount = 0;
           string* same = new string[m_count]{};   // for output later
 
-          
-          out << "Alikeness is " << amount << "out of " << m_count << ':';
+
+          out << "Alikeness is " << amount << "out of " << m_count << ":\n";
+          for(int i = 0; i < amount; i++){
+               out << i+1 << ". " << same[i] << endl;
+          }
 
           out.close();
           delete[] same; // clears out the heap
