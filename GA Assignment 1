@@ -2,32 +2,31 @@
 #include <iostream>
 #include <fstream>
 #include <cassert>  //for assert()
-#include <cstddef>
+#include <algorithm>
 #include "ArgumentManager.h"
 using namespace std;
 
-template <typename T>
 class List{
 
 private:
      struct Node{
-          Node * Next{NULL};  //this is a pointer that hold the address of a node
-          T Data{}; //this hold the data of the node type T
+          Node * Next{nullptr};  //this is a pointer that hold the address of a node
+          string Data{}; //this hold the data of the node type T
 
           // this is a default constructor that sets ecerything to null
           Node( ) = default;
 
           //creates a node stroring input data
-          explicit Node (const T& data)
+          explicit Node (const string& data)
                : Data{data}{}
 
           /*creates a node storing input data and poiting to another node*/
-          Node (const T& data, Node* next)
+          Node (const string& data, Node* next)
                : Data{data}, Next{next}{}
 
      };
 
-     Node* m_head{NULL}; //hold the address of the head
+     Node* m_head{nullptr}; //hold the address of the head
      int m_count{0};     // hold the number of nodes in thel ist
 
      //doesnt allow copy ///basically deletes the functionality unless i program it to do so
@@ -56,8 +55,11 @@ public:
                RemoveHead(); //removes the current head node
           }
      }
+     Node* GetHead(){
+          return m_head;
+     }
 
-     void InsertHead(const T& value){
+     void InsertHead(const string& value){
           Node* node = new Node{value}; //making a new node
 
           node->Next = m_head;     //points the new node to the head node
@@ -80,15 +82,15 @@ public:
           --m_count;
      }
 
-     T ElementAt (Position node){  //access the data stored in a given node
+     string ElementAt (Position node){  //access the data stored in a given node
           assert(! IsEmpty());
-          assert( node != NULL);
+          assert( node != nullptr);
 
           return node->Data;
      }
 
-     void InsertAfter(Position node, const T& value){
-          assert(node != NULL);
+     void InsertAfter(Position node, const string& value){
+          assert(node != nullptr);
 
           Node* newNode = new Node{value};   //makes a new node
 
@@ -101,7 +103,7 @@ public:
 
      void RemoveAfter(Position node){
           assert( ! IsEmpty());
-          assert(node != NULL);
+          assert(node != nullptr);
 
           Node* obsoleteNode = node->Next; // obNode holds the address to what node is pointing to
           node->Next = obsoleteNode->Next;
@@ -111,19 +113,17 @@ public:
           --m_count;
 
      }
-/////////////////
-////////////
-///////////
-     void compare(const List& obj, string ofile) const {
+
+     void compare( List& obj, string ofile) const {
           ofstream out(ofile); //opens output file
           int amount = 0;
           Node* node = m_head;
-          Node* node2 =  obj.m_head;
+          Node* node2 =  obj.GetHead();    // make a function to retur nhead///////////////////////////////////////////////////////////////////
           string* same = new string[m_count]{};   // for output later
 
-          while(node != NULL){
+          while(node != nullptr){
 
-               while(node2 != NULL){
+               while(node2 != nullptr){
                     if(node->Data == node2->Data){
                          same[amount] = node->Data;
                          ++amount;
@@ -133,28 +133,42 @@ public:
                node = node->Next;
                node2 = obj.m_head;
           }
+          string temp;
+          for(int i = 0; i < amount - 1; i++){
+               for(int j = 0; j < amount - i - 1; j++){
+                    if(same[j].substr(0) > same[j+1].substr(0)){
+                         temp = same[j];
+                         same[j] = same[j+1];
+                         same[j+1] = temp;
+                    }else if (same[j].substr(0) == same[j+1].substr(0)){
+                         int pos = same[j].find(' ');
+                         int pos2 = same[j+1].find(' ');
+                         if(same[j].substr(pos+1,pos+2) > same[j+1].substr(pos2+1,pos2+2)){
+                              temp = same[j];
+                              same[j] = same[j+1];
+                              same[j+1] = temp;
+                         }
+                    }
+               }
+          }
 
-
-          out << "Alikeness is " << amount << "out of " << m_count << ":\n";
+          out << "Alikeness is " << amount << " out of " << m_count << ":\n";
           for(int i = 0; i < amount; i++){
                out << i+1 << ". " << same[i] << endl;
           }
 
           out.close();
           delete[] same; // clears out the heap
-          delete same;
 }
-////////////
-//////////
-///////////
-     Position Find(const T& value){     //passing by refference without allowing change to data to prevent expensive copy of informationg that would happen if passed by value
+
+     Position Find(const string& value){     //passing by refference without allowing change to data to prevent expensive copy of informationg that would happen if passed by value
           if(IsEmpty()){
-               return NULL;
+               return nullptr;
           }
 
           //linear search
           Node* node = m_head;
-          while(node != NULL){
+          while(node != nullptr){
                //compare current node's data with the search value
                if(node->Data == value){
                     //found
@@ -165,7 +179,7 @@ public:
           }
 
           //after traversing the whole list, no mathcing element was found
-          return NULL;
+          return nullptr;
      }
 
      void Read(string file){
@@ -190,8 +204,8 @@ int main(int argc, char* argv[])
   string jituFileName = am.get("jitu_miya");
   string outputFileName = am.get("output");
 
-  List <string>haru; //makes a haru object of type string
-  List <string>jitu;; //makes a jitu object of typr string
+  List haru; //makes a haru object of type string
+  List jitu;; //makes a jitu object of typr string
 
   haru.Read(haruFileName);    //fills the haru list
   jitu.Read(jituFileName);    //fills the jitu list
